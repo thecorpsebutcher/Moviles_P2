@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
-import '../widgets/player.dart';
 import 'dart:async';
 
-class MyGameApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: GameScreen(),
-    );
-  }
-}
-
-
 class GameScreen extends StatefulWidget {
+  final Color playerColor;       // color del jugador
+  final Color backgroundColor;   // color de fondo
+
+  GameScreen({
+    required this.playerColor,
+    required this.backgroundColor,
+  });
+
   @override
   _GameScreenState createState() => _GameScreenState();
 }
@@ -26,9 +22,7 @@ class _GameScreenState extends State<GameScreen> {
   double gravity = 0.5;
   double jump = -10;
 
-  late Player player;
   double circleSize = 50;
-
   Timer? _timer;
 
   int score = 0;
@@ -36,7 +30,6 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    player = Player();
     _startGame();
   }
 
@@ -60,17 +53,16 @@ class _GameScreenState extends State<GameScreen> {
 
         // --- Movimiento horizontal ---
         xPosition += velocityX;
-
         double maxWidth = MediaQuery.of(context).size.width - circleSize;
 
         if (xPosition <= 0) {
           xPosition = 0;
           velocityX = velocityX.abs(); // cambiar a derecha
-          score ++;
+          score++;
         } else if (xPosition >= maxWidth) {
           xPosition = maxWidth;
           velocityX = -velocityX.abs(); // cambiar a izquierda
-          score ++;
+          score++;
         }
       });
     });
@@ -93,9 +85,10 @@ class _GameScreenState extends State<GameScreen> {
     return GestureDetector(
       onTap: _jumpUp,
       child: Scaffold(
-        backgroundColor: Colors.blueGrey[900],
+        backgroundColor: widget.backgroundColor, // usa el color pasado
         body: Stack(
           children: [
+            // Jugador
             Positioned(
               left: xPosition,
               top: yPosition,
@@ -103,21 +96,22 @@ class _GameScreenState extends State<GameScreen> {
                 width: circleSize,
                 height: circleSize,
                 decoration: BoxDecoration(
-                  color: Colors.red,
+                  color: widget.playerColor, // usa el color pasado
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-          // Score arriba izquierda
+
+            // Score arriba
             Align(
-              alignment: Alignment.topCenter, // arriba y centrado horizontal
+              alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.only(top: 30), // separarlo del borde superior
+                padding: EdgeInsets.only(top: 30),
                 child: Text(
                   '$score',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 112, 114, 145),
-                    fontSize: 100,
+                    color: Colors.white,
+                    fontSize: 50,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

@@ -8,12 +8,19 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  double yPosition = 0;
-  double velocity = 0;
+  double yPosition = 0;       
+  double xPosition = 0;       
+  double velocityY = 0;      
+  double velocityX = -3;      
   double gravity = 0.5;
   double jump = -10;
+
   late Player player;
+  double circleSize = 50;
+
   Timer? _timer;
+
+  int points = 0;
 
   @override
   void initState() {
@@ -25,17 +32,32 @@ class _GameScreenState extends State<GameScreen> {
   void _startGame() {
     _timer = Timer.periodic(Duration(milliseconds: 16), (timer) {
       setState(() {
-        velocity += gravity;
-        yPosition += velocity;
+        // --- Movimiento vertical ---
+        velocityY += gravity;
+        yPosition += velocityY;
 
-        double maxHeight = MediaQuery.of(context).size.height - 50;
+        // Limites verticales
+        double maxHeight = MediaQuery.of(context).size.height - circleSize;
         if (yPosition > maxHeight) {
           yPosition = maxHeight;
-          velocity = 0;
+          velocityY = 0;
         }
         if (yPosition < 0) {
           yPosition = 0;
-          velocity = 0;
+          velocityY = 0;
+        }
+
+        // --- Movimiento horizontal ---
+        xPosition += velocityX;
+
+        double maxWidth = MediaQuery.of(context).size.width - circleSize;
+
+        if (xPosition <= 0) {
+          xPosition = 0;
+          velocityX = velocityX.abs(); // cambiar a derecha
+        } else if (xPosition >= maxWidth) {
+          xPosition = maxWidth;
+          velocityX = -velocityX.abs(); // cambiar a izquierda
         }
       });
     });
@@ -43,7 +65,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void _jumpUp() {
     setState(() {
-      velocity = jump;
+      velocityY = jump;
     });
   }
 
@@ -62,9 +84,16 @@ class _GameScreenState extends State<GameScreen> {
         body: Stack(
           children: [
             Positioned(
-              left: MediaQuery.of(context).size.width / 2 - 25,
+              left: xPosition,
               top: yPosition,
-              child: player,
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  shape: BoxShape.circle,
+                ),
+              ),
             ),
           ],
         ),

@@ -12,7 +12,7 @@ class MenuScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Mi Juego",
+              "El jueguillo de la bolilla que robotea",
               style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 50),

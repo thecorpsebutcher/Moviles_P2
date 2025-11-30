@@ -2,41 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:juego_flutter/screens/ranking_screen.dart';
 import 'dart:async';
 import '../scoreManager.dart';
-import 'package:audioplayers/audioplayers.dart';
+import 'optionsMenu_screen.dart';
+import '../audio_manager.dart';
+import '../countdown_overlay.dart';
 
-class SoundEffect {
-  final String assetPath;
-  final double volume;
-  final List<AudioPlayer> pool = [];
-
-  SoundEffect(this.assetPath, {this.volume = 1.0});
-
-  Future play() async {
-    AudioPlayer freePlayer = pool.firstWhere(
-      (p) => p.state != PlayerState.playing,
-      orElse: () {
-        final newPlayer = AudioPlayer();
-        pool.add(newPlayer);
-        return newPlayer;
-      },
-    );
-
-    await freePlayer.play(
-      AssetSource(assetPath),
-      volume: volume,
-    );
-  }
-
-  void dispose() {
-    for (var p in pool) {
-      p.dispose();
-    }
-  }
-}
 
 class GameScreen extends StatefulWidget {
-  final Color playerColor;       // color del jugador
-  final Color backgroundColor;   // color de fondo
+  final Color playerColor;
+  final Color backgroundColor;
 
   GameScreen({
     required this.playerColor,
@@ -48,10 +21,10 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  double yPosition = 0;       
-  double xPosition = 0;       
-  double velocityY = 0;      
-  double velocityX = -3;      
+  double yPosition = 0;
+  double xPosition = 0;
+  double velocityY = 0;
+  double velocityX = -3;
   double gravity = 0.5;
   double jump = -10;
 
@@ -68,23 +41,18 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Creamos AudioPlayers individuales
-    bouncePlayer = SoundEffect('sounds/ballBounce.wav', volume: 0.7);
-    jumpPlayer = SoundEffect('sounds/jump.wav', volume: 0.3);
+    bouncePlayer = SoundEffect('sounds/ballBounce.wav');
+    jumpPlayer = SoundEffect('sounds/jump.wav');
     deathPlayer = SoundEffect('sounds/death.wav');
-
     _startGame();
   }
 
   void _startGame() {
-    _timer = Timer.periodic(Duration(milliseconds: 16), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 16), (timer) {
       setState(() {
-        // --- Movimiento vertical ---
         velocityY += gravity;
         yPosition += velocityY;
 
-        // Limites verticales
         double maxHeight = MediaQuery.of(context).size.height - circleSize;
         if (yPosition > maxHeight) {
           yPosition = maxHeight;
@@ -99,18 +67,17 @@ class _GameScreenState extends State<GameScreen> {
           gameOver();
         }
 
-        // --- Movimiento horizontal ---
         xPosition += velocityX;
         double maxWidth = MediaQuery.of(context).size.width - circleSize;
 
         if (xPosition <= 0) {
           xPosition = 0;
-          velocityX = velocityX.abs(); // cambiar a derecha
+          velocityX = velocityX.abs();
           score++;
           playBounceSound();
         } else if (xPosition >= maxWidth) {
           xPosition = maxWidth;
-          velocityX = -velocityX.abs(); // cambiar a izquierda
+          velocityX = -velocityX.abs();
           score++;
           playBounceSound();
         }
@@ -118,13 +85,35 @@ class _GameScreenState extends State<GameScreen> {
     });
   }
 
+  void pauseGame() {
+    _timer?.cancel();
+  }
+
+ Future<void> resumeGameWithCountdown() async {
+  int countdown = 3;
+
+  await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) {
+      return CountdownOverlay(
+        countdownStart: countdown,
+        onFinished: () {
+          Navigator.of(context).pop(); // cerrar overlay
+          velocityY = jump;            // aplicar salto
+          playJumpSound();             // reproducir sonido de salto
+          _startGame();                // reanudar juego
+        },
+      );
+    },
+  );
+}
+
+
+
   void gameOver() async {
     _timer?.cancel();
-
-    // Guardar la puntuación actual
     await ScoreManager.saveScore(score);
-
-    // Ir directamente a la pantalla de ranking
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => RankingScreen()),
@@ -156,10 +145,33 @@ class _GameScreenState extends State<GameScreen> {
     return GestureDetector(
       onTap: _jumpUp,
       child: Scaffold(
-        backgroundColor: widget.backgroundColor, // usa el color pasado
+        backgroundColor: widget.backgroundColor,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings, color: Colors.white),
+              onPressed: () {
+                pauseGame();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OptionsMenuScreen(
+                      fromGame: true,
+                      onResume: () {
+                        resumeGameWithCountdown();
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
+
+          ],
+        ),
         body: Stack(
           children: [
-            // Jugador
             Positioned(
               left: xPosition,
               top: yPosition,
@@ -167,30 +179,30 @@ class _GameScreenState extends State<GameScreen> {
                 width: circleSize,
                 height: circleSize,
                 decoration: BoxDecoration(
-                  color: widget.playerColor, // usa el color pasado
+                  color: widget.playerColor,
                   shape: BoxShape.circle,
                 ),
               ),
             ),
-
-            // Score arriba
             Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.only(top: 30),
                 child: Text(
                   '$score',
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 50,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+

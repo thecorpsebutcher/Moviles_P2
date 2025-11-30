@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'game_screen.dart';
 import 'dart:io';
 import 'ranking_screen.dart';
+import 'optionsMenu_screen.dart';
+
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -86,6 +88,19 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Text("Ranking"),
             ),
             SizedBox(height: 20),
+
+            //Botón opciones
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const OptionsMenuScreen()),
+                );
+              },
+              child: const Text('Opciones'),
+            ),
+
+            const SizedBox(height: 20),
 
             // Botón salir
             ElevatedButton(

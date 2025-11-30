@@ -14,6 +14,8 @@ import '../widgets/pincho.dart';
 class GameScreen extends StatefulWidget {
   final Color playerColor;
   final Color backgroundColor;
+  final Color playerColor;
+  final Color backgroundColor;
 
   GameScreen({required this.playerColor, required this.backgroundColor});
 
@@ -282,6 +284,7 @@ class _GameScreenState extends State<GameScreen> {
                 height: circleSize,
                 decoration: BoxDecoration(
                   color: widget.playerColor,
+                  color: widget.playerColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -316,6 +319,7 @@ class _GameScreenState extends State<GameScreen> {
               alignment: Alignment.topCenter,
               child: Padding(
                 padding: const EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.only(top: 30),
                 child: Text(
                   '$score',
                   style: const TextStyle(
@@ -325,9 +329,12 @@ class _GameScreenState extends State<GameScreen> {
                 ),
               ),
             ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
+

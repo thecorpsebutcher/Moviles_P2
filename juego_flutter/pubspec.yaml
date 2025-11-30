@@ -24,3 +24,4 @@ flutter:
     - assets/sounds/ballBounce.wav
     - assets/sounds/death.wav
     - assets/sounds/jump.wav
+    - assets/sprites/spike.png

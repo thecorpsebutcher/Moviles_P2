@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'screens/menu_screen.dart';
+import 'audio_manager.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AudioManager().loadVolume();
   runApp(MyGameApp());
 }
 

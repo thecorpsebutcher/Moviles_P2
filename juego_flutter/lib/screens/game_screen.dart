@@ -1,165 +1,279 @@
 import 'package:flutter/material.dart';
-import 'package:juego_flutter/screens/ranking_screen.dart';
+import 'package:flutter/services.dart';
 import 'dart:async';
+import 'dart:math' as math;
+import 'dart:ui' as ui;
+
 import '../scoreManager.dart';
-import 'package:audioplayers/audioplayers.dart';
-
-class SoundEffect {
-  final String assetPath;
-  final double volume;
-  final List<AudioPlayer> pool = [];
-
-  SoundEffect(this.assetPath, {this.volume = 1.0});
-
-  Future play() async {
-    AudioPlayer freePlayer = pool.firstWhere(
-      (p) => p.state != PlayerState.playing,
-      orElse: () {
-        final newPlayer = AudioPlayer();
-        pool.add(newPlayer);
-        return newPlayer;
-      },
-    );
-
-    await freePlayer.play(
-      AssetSource(assetPath),
-      volume: volume,
-    );
-  }
-
-  void dispose() {
-    for (var p in pool) {
-      p.dispose();
-    }
-  }
-}
+import '../audio_manager.dart';
+import '../countdown_overlay.dart';
+import '../screens/ranking_screen.dart';
+import '../screens/optionsMenu_screen.dart';
+import '../widgets/pincho.dart';
 
 class GameScreen extends StatefulWidget {
-  final Color playerColor;       // color del jugador
-  final Color backgroundColor;   // color de fondo
+  final Color playerColor;
+  final Color backgroundColor;
 
-  GameScreen({
-    required this.playerColor,
-    required this.backgroundColor,
-  });
+  GameScreen({required this.playerColor, required this.backgroundColor});
 
   @override
   _GameScreenState createState() => _GameScreenState();
 }
 
 class _GameScreenState extends State<GameScreen> {
-  double yPosition = 0;       
-  double xPosition = 0;       
-  double velocityY = 0;      
-  double velocityX = -3;      
+  double xPosition = 0;
+  double yPosition = 0;
+  double velocityX = -3;
+  double velocityY = 0;
   double gravity = 0.5;
   double jump = -10;
 
   double circleSize = 50;
-  Timer? _timer;
+
+  late double screenWidth;
+  late double screenHeight;
+  late double slotHeight;
+  late double pinchoHeight;
+  double marginTop = 50;
+  double marginBottom = 50;
+
+  int numSlotsV = 5;
+
+  late List<bool> pinchosIzq;
+  late List<bool> pinchosDer;
+
+  late Timer _timer;
 
   int score = 0;
 
-  // SONIDOS
+  // Sonidos
   late SoundEffect bouncePlayer;
   late SoundEffect jumpPlayer;
   late SoundEffect deathPlayer;
+
+  // Pincho widget cache
+  late final String spikeWidget;
 
   @override
   void initState() {
     super.initState();
 
-    // Creamos AudioPlayers individuales
-    bouncePlayer = SoundEffect('sounds/ballBounce.wav', volume: 0.7);
-    jumpPlayer = SoundEffect('sounds/jump.wav', volume: 0.3);
+    // Cargar imagen de pincho
+    spikeWidget = 'assets/sprites/spike.png';
+
+    bouncePlayer = SoundEffect('sounds/ballBounce.wav');
+    jumpPlayer = SoundEffect('sounds/jump.wav');
     deathPlayer = SoundEffect('sounds/death.wav');
 
-    _startGame();
+    // Esperar primer frame para usar MediaQuery
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      screenWidth = MediaQuery.of(context).size.width;
+      screenHeight = MediaQuery.of(context).size.height - 150;
+
+
+      pinchoHeight = 20;
+      slotHeight = (screenHeight - marginTop - marginBottom) / numSlotsV;
+
+      // Posición inicial centrada
+      xPosition = screenWidth / 2 - circleSize / 2;
+      yPosition = screenHeight / 2 - circleSize / 2;
+
+      // Pinchos iniciales
+      pinchosIzq = emptySpikes(numSlotsV);
+      pinchosDer = emptySpikes(numSlotsV);
+
+      _startGame();
+    });
   }
 
   void _startGame() {
-    _timer = Timer.periodic(Duration(milliseconds: 16), (timer) {
-      setState(() {
-        // --- Movimiento vertical ---
-        velocityY += gravity;
-        yPosition += velocityY;
+    _timer = Timer.periodic(const Duration(milliseconds: 16), (_) {
+      // Actualizar física de la bola
+      velocityY += gravity;
+      yPosition += velocityY;
+      xPosition += velocityX;
 
-        // Limites verticales
-        double maxHeight = MediaQuery.of(context).size.height - circleSize;
-        if (yPosition > maxHeight) {
-          yPosition = maxHeight;
-          velocityY = 0;
+      // Rebote izquierdo/derecho
+      if (xPosition <= 0) {
+        xPosition = 0;
+        velocityX = velocityX.abs();
+        score++;
+        playBounceSound();
+        pinchosDer = resetSpikes(numSlotsV);
+        pinchosIzq = emptySpikes(numSlotsV);
+      } else if (xPosition + circleSize >= screenWidth) {
+        xPosition = screenWidth - circleSize;
+        velocityX = -velocityX.abs();
+        score++;
+        playBounceSound();
+        pinchosIzq = resetSpikes(numSlotsV);
+        pinchosDer = emptySpikes(numSlotsV);
+      }
+
+      // Detectar colisiones solo con pinchos
+      
+      setState(() {}); // Solo actualiza bola y score
+      for (int i = 0; i < numSlotsV; i++) {
+        // izquierda
+        if (pinchosIzq[i] &&
+            tocaPincho(
+              pinchoHeight,
+              marginTop + i * slotHeight,
+               pinchoHeight,
+              slotHeight,
+              xPosition,
+              yPosition,
+              circleSize,
+            )) {
           playDeathSound();
           gameOver();
         }
-        if (yPosition < 0) {
-          yPosition = 0;
-          velocityY = 0;
+        // derecha
+        if (pinchosDer[i] &&
+            tocaPincho(
+              screenWidth - 70 + pinchoHeight,
+              marginTop + i * slotHeight,
+               pinchoHeight,
+              slotHeight,
+              xPosition,
+              yPosition,
+              circleSize,
+            )) {
           playDeathSound();
           gameOver();
         }
-
-        // --- Movimiento horizontal ---
-        xPosition += velocityX;
-        double maxWidth = MediaQuery.of(context).size.width - circleSize;
-
-        if (xPosition <= 0) {
-          xPosition = 0;
-          velocityX = velocityX.abs(); // cambiar a derecha
-          score++;
-          playBounceSound();
-        } else if (xPosition >= maxWidth) {
-          xPosition = maxWidth;
-          velocityX = -velocityX.abs(); // cambiar a izquierda
-          score++;
-          playBounceSound();
-        }
-      });
+      }
+      if(yPosition <=  0)
+      {
+          playDeathSound();
+          gameOver();
+      }
+      if(yPosition >= (slotHeight*numSlotsV)+slotHeight)
+      {
+        playDeathSound();
+        gameOver();
+      }
     });
   }
 
-  void gameOver() async {
-    _timer?.cancel();
+  bool tocaPincho(double px, double py, double pw, double ph, double bx, double by, double bs){
+      // Centro de la bola
+  double cx = bx + bs / 2;
+  double cy = by + bs / 2;
 
-    // Guardar la puntuación actual
-    await ScoreManager.saveScore(score);
+  // Limites del pincho
+  double left = px;
+  double right = px + pw;
+  double top = py;
+  double bottom = py + ph;
 
-    // Ir directamente a la pantalla de ranking
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => RankingScreen()),
-    );
+  // Revisar si el centro de la bola está dentro del pincho (puedes añadir un padding)
+  const double padding = 3;
+  return cx > left + padding && cx < right - padding && cy > top + padding && cy < bottom - padding;
+  
   }
 
-  void _jumpUp() {
-    setState(() {
-      velocityY = jump;
-      playJumpSound();
-    });
+  List<bool> emptySpikes(int n) => List.generate(n, (_) => false);
+
+  List<bool> resetSpikes(int n) {
+  math.Random rand = math.Random();
+
+  // Si n es demasiado pequeño, simplemente devolvemos todo vacío
+  if (n <= 1) {
+    return List<bool>.filled(n, false);
+  }
+
+  int minSpikes = 2;
+  int maxSpikes = 3;
+
+  // No se pueden poner más pinchos que espacios disponibles
+  int maxPossible = n;
+
+  // Elegimos cuántos pinchos habrá (si n es pequeño, se reduce automáticamente)
+  int totalSpikes = rand.nextInt(maxSpikes - minSpikes + 1) + minSpikes;
+  totalSpikes = totalSpikes.clamp(0, maxPossible);
+
+  // Lista inicial (todos vacíos)
+  List<bool> spikes = List<bool>.filled(n, false);
+
+  // Creamos una lista con todos los índices disponibles
+  List<int> allSlots = List.generate(n, (i) => i);
+
+  // Mezclamos para elegir aleatoriamente
+  allSlots.shuffle(rand);
+
+  // Activamos los primeros `totalSpikes` slots
+  for (int i = 0; i < totalSpikes; i++) {
+    spikes[allSlots[i]] = true;
+  }
+
+  return spikes;
   }
 
   void playBounceSound() => bouncePlayer.play();
   void playJumpSound() => jumpPlayer.play();
   void playDeathSound() => deathPlayer.play();
 
+  void gameOver() async {
+    _timer?.cancel(); 
+    await ScoreManager.saveScore(score); 
+    Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => RankingScreen()), );
+  }
+
+  void _jumpUp() {
+    velocityY = jump;
+    playJumpSound();
+  }
+
   @override
   void dispose() {
-    _timer?.cancel();
+    _timer.cancel();
     bouncePlayer.dispose();
     jumpPlayer.dispose();
     deathPlayer.dispose();
     super.dispose();
   }
 
+  void pauseGame() { _timer?.cancel(); }
+
+  Future<void> resumeGameWithCountdown() async 
+  { int countdown = 3;
+   await showDialog(
+     context: context,
+      barrierDismissible: false,
+       builder: (context) {
+         return CountdownOverlay(
+           countdownStart: 
+           countdown,
+            onFinished: () {
+               Navigator.of(context).pop(); // cerrar overlay 
+               velocityY = jump; // aplicar salto
+                playJumpSound(); // reproducir sonido de salto 
+                _startGame(); // reanudar juego 
+                },
+                 );
+                  },
+                   );
+                    }
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _jumpUp,
-      child: Scaffold(
-        backgroundColor: widget.backgroundColor, // usa el color pasado
+     child: Scaffold( backgroundColor: widget.backgroundColor, 
+     appBar: AppBar( backgroundColor:
+      Colors.transparent,
+       elevation: 0,
+        actions: [
+           IconButton(
+             icon: const Icon(Icons.settings, color: Colors.white),
+              onPressed: () { 
+                pauseGame();
+                 Navigator.push( context, MaterialPageRoute( builder: (context) => OptionsMenuScreen( fromGame: true,
+                  onResume: () { resumeGameWithCountdown(); }, ), ), ); }, ), ], ),
         body: Stack(
           children: [
-            // Jugador
+            // Bola
             Positioned(
               left: xPosition,
               top: yPosition,
@@ -167,27 +281,50 @@ class _GameScreenState extends State<GameScreen> {
                 width: circleSize,
                 height: circleSize,
                 decoration: BoxDecoration(
-                  color: widget.playerColor, // usa el color pasado
+                  color: widget.playerColor,
                   shape: BoxShape.circle,
                 ),
               ),
             ),
 
-            // Score arriba
+            // Pinchos IZQ
+            for (int i = 0; i < numSlotsV; i++)
+              if (pinchosIzq[i])
+                Pincho(
+                  x: -50,
+                  y: marginBottom + i * slotHeight,
+                  width: slotHeight,
+                  height: pinchoHeight,
+                  rotation: math.pi / 2,
+                  assetPath: spikeWidget,
+                ),
+
+            // Pinchos DER
+            for (int i = 0; i < numSlotsV; i++)
+              if (pinchosDer[i])
+                Pincho(
+                  x: screenWidth-70,
+                  y: marginBottom + i * slotHeight,
+                  width: slotHeight,
+                  height: pinchoHeight,
+                  rotation: -math.pi / 2,
+                  assetPath: spikeWidget,
+                ),
+
+            // Score
             Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.only(top: 30),
+                padding: const EdgeInsets.only(top: 30),
                 child: Text(
                   '$score',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 50,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 50,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

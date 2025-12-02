@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../audio_manager.dart';
 import 'menu_screen.dart';
+import '../music_manager.dart';
 
 class OptionsMenuScreen extends StatefulWidget {
   final VoidCallback? onResume;
@@ -14,6 +15,13 @@ class OptionsMenuScreen extends StatefulWidget {
 
 class _OptionsMenuScreenState extends State<OptionsMenuScreen> {
   double _volume = AudioManager().volume;
+
+  @override
+  void initState() {
+    super.initState();
+    MusicManager().playMenuMusic(); // asegura que la música siga
+  }
+
 
   @override
   Widget build(BuildContext context) {

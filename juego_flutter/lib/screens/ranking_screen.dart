@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../scoreManager.dart';
+import '../music_manager.dart';
 import 'menu_screen.dart';
 
 class RankingScreen extends StatefulWidget {
@@ -17,6 +18,7 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
+    MusicManager().playMenuMusic(); // asegura que la música siga
     loadScores();
   }
 

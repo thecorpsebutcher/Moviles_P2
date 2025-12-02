@@ -3,6 +3,7 @@ import 'game_screen.dart';
 import 'dart:io';
 import 'ranking_screen.dart';
 import 'optionsMenu_screen.dart';
+import '../music_manager.dart';
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -18,6 +19,12 @@ class _MenuScreenState extends State<MenuScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    MusicManager().playMenuMusic(); // inicia música en bucle
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.blueGrey[900],
@@ -26,7 +33,7 @@ class _MenuScreenState extends State<MenuScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "El jueguillo de la bolilla que rebotea",
+              "PELOTUDA",
               style: TextStyle(
                 fontFamily: 'PressStart',
                 fontSize: 32,
@@ -71,6 +78,7 @@ class _MenuScreenState extends State<MenuScreen> {
                 ),
               ),
               onPressed: () {
+                MusicManager().pauseMusic(); // pausa música en el juego
                 Navigator.push(
                   context,
                   MaterialPageRoute(

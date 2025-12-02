@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import '../scoreManager.dart';
 import '../audio_manager.dart';
+import '../music_manager.dart';
 import '../countdown_overlay.dart';
 import '../screens/ranking_screen.dart';
 import '../screens/optionsMenu_screen.dart';
@@ -57,7 +58,7 @@ class _GameScreenState extends State<GameScreen> {
   late SoundEffect bouncePlayer;
   late SoundEffect jumpPlayer;
   late SoundEffect deathPlayer;
-  late BackgroundMusic bgMusic;
+  // late BackgroundMusic bgMusic;
 
   // Pincho widget cache
   late final String spikeWidget;
@@ -65,6 +66,8 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
+
+    MusicManager().pauseMusic(); // pausa la música del menú
 
     // Cargar imagen de pincho
     spikeWidget = 'assets/sprites/spike.png';
@@ -75,8 +78,8 @@ class _GameScreenState extends State<GameScreen> {
     deathPlayer = SoundEffect('sounds/death.wav');
 
     // Música en bucle
-    bgMusic = BackgroundMusic('music/Boing.wav');
-    bgMusic.playLoop();
+    // bgMusic = BackgroundMusic('music/Boing.wav');
+    // bgMusic.playLoop();
 
     // Esperar primer frame para usar MediaQuery
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -279,10 +282,19 @@ bool tocaPincho({
   void playDeathSound() => deathPlayer.play();
 
   void gameOver() async {
-    _timer?.cancel(); 
-    await ScoreManager.saveScore(score); 
-    Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => RankingScreen()), );
-  }
+  _timer?.cancel(); 
+  await ScoreManager.saveScore(score);
+
+  // Reanudar música
+  // await MusicManager().playMenuMusic(); // <- aseguramos que arranque en menú
+
+  // Navegar a RankingScreen sin reemplazar rutas anteriores
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => RankingScreen(lastScore: score)),
+  );
+}
+
 
  void _jumpUp() {
   velocityY = jump;
@@ -317,7 +329,7 @@ bool tocaPincho({
 void dispose() {
   _timer.cancel();
 
-  bgMusic.dispose();
+  // bgMusic.dispose();
   
   super.dispose();
 }

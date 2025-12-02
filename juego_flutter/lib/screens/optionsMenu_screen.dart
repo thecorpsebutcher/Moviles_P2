@@ -3,8 +3,8 @@ import '../audio_manager.dart';
 import 'menu_screen.dart';
 
 class OptionsMenuScreen extends StatefulWidget {
-  final VoidCallback? onResume; // callback para reanudar el juego
-  final bool fromGame; // indica si viene desde GameScreen
+  final VoidCallback? onResume;
+  final bool fromGame;
 
   const OptionsMenuScreen({Key? key, this.onResume, this.fromGame = false}) : super(key: key);
 
@@ -26,17 +26,19 @@ class _OptionsMenuScreenState extends State<OptionsMenuScreen> {
             Text(
               "Opciones",
               style: TextStyle(
+                fontFamily: 'PressStart',
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFFFF8E1), // blanco hueso
+                color: Color(0xFFFFF8E1),
               ),
             ),
             SizedBox(height: 10),
             Text(
               "Ajustes del juego",
               style: TextStyle(
+                fontFamily: 'PressStart',
                 fontSize: 16,
-                color: Color(0xFFFFF8E1), // blanco hueso
+                color: Color(0xFFFFF8E1),
               ),
             ),
             SizedBox(height: 30),
@@ -44,22 +46,23 @@ class _OptionsMenuScreenState extends State<OptionsMenuScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 40.0),
               child: Column(
                 children: [
-                  // Control de volumen
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "Volumen",
                         style: TextStyle(
+                          fontFamily: 'PressStart',
                           fontSize: 18,
-                          color: Color(0xFFFFF8E1), // blanco hueso
+                          color: Color(0xFFFFF8E1),
                         ),
                       ),
                       Text(
                         "${(_volume * 100).round()}%",
                         style: TextStyle(
+                          fontFamily: 'PressStart',
                           fontSize: 18,
-                          color: Color(0xFFFFF8E1), // blanco hueso
+                          color: Color(0xFFFFF8E1),
                         ),
                       ),
                     ],
@@ -78,37 +81,34 @@ class _OptionsMenuScreenState extends State<OptionsMenuScreen> {
                     },
                   ),
                   SizedBox(height: 30),
-                  // Botón "Seguir jugando" solo si viene del juego
                   if (widget.fromGame)
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green.shade400,
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                        padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20),
                         ),
                       ),
                       onPressed: () {
-                        Navigator.pop(context); // cerrar menú
+                        Navigator.pop(context);
                         if (widget.onResume != null) widget.onResume!();
                       },
                       child: Text(
                         "Seguir jugando",
                         style: TextStyle(
+                          fontFamily: 'PressStart',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFFFF8E1), // blanco hueso
+                          color: Color(0xFFFFF8E1),
                         ),
                       ),
                     ),
                   SizedBox(height: 20),
-                  // Botón "Volver al menú"
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.green.shade400,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+                      padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
                       ),
@@ -123,9 +123,10 @@ class _OptionsMenuScreenState extends State<OptionsMenuScreen> {
                     child: Text(
                       "Volver al Menú",
                       style: TextStyle(
+                        fontFamily: 'PressStart',
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFFFFF8E1), // blanco hueso
+                        color: Color(0xFFFFF8E1),
                       ),
                     ),
                   ),

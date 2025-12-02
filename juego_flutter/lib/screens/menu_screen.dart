@@ -10,7 +10,7 @@ class MenuScreen extends StatefulWidget {
 }
 
 class _MenuScreenState extends State<MenuScreen> {
-  int selectedIndex = 0; // índice del color seleccionado
+  int selectedIndex = 0;
   final List<Color> playerColors = [
     const Color.fromARGB(255, 218, 123, 213),
     const Color.fromARGB(255, 255, 220, 105),
@@ -28,15 +28,14 @@ class _MenuScreenState extends State<MenuScreen> {
             Text(
               "El jueguillo de la bolilla que rebotea",
               style: TextStyle(
+                fontFamily: 'PressStart',
                 fontSize: 32,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFFFF8E1), // blanco hueso
+                color: Color(0xFFFFF8E1),
               ),
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 50),
-
-            // Selección de color EXACTAMENTE igual que antes
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(playerColors.length, (index) {
@@ -63,8 +62,6 @@ class _MenuScreenState extends State<MenuScreen> {
               }),
             ),
             SizedBox(height: 50),
-
-            // Botón Jugar
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade400,
@@ -87,15 +84,14 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Text(
                 "Jugar",
                 style: TextStyle(
+                  fontFamily: 'PressStart',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFFFF8E1), // blanco hueso
+                  color: Color(0xFFFFF8E1),
                 ),
               ),
             ),
             SizedBox(height: 20),
-
-            // Botón Ranking
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade400,
@@ -107,23 +103,20 @@ class _MenuScreenState extends State<MenuScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => RankingScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => RankingScreen()),
                 );
               },
               child: Text(
                 "Ranking",
                 style: TextStyle(
+                  fontFamily: 'PressStart',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFFFF8E1), // blanco hueso
+                  color: Color(0xFFFFF8E1),
                 ),
               ),
             ),
             SizedBox(height: 20),
-
-            // Botón Opciones
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green.shade400,
@@ -141,15 +134,14 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Text(
                 "Opciones",
                 style: TextStyle(
+                  fontFamily: 'PressStart',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFFFF8E1), // blanco hueso
+                  color: Color(0xFFFFF8E1),
                 ),
               ),
             ),
             SizedBox(height: 20),
-
-            // Botón Salir
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red.shade600,
@@ -162,9 +154,10 @@ class _MenuScreenState extends State<MenuScreen> {
               child: Text(
                 "Salir",
                 style: TextStyle(
+                  fontFamily: 'PressStart',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFFFFF8E1), // blanco hueso
+                  color: Color(0xFFFFF8E1),
                 ),
               ),
             ),

@@ -58,9 +58,10 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
             child: Text(
               "$score",
               style: TextStyle(
+                fontFamily: 'PressStart',
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: Colors.black, // números del podio en negro
+                color: Colors.black,
               ),
             ),
           ),
@@ -122,17 +123,19 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
             title: Text(
               "Puntuación: ${remainingScores[index]}",
               style: TextStyle(
-                color: Color(0xFFFFF8E1), // blanco hueso
+                fontFamily: 'PressStart',
                 fontWeight: isLast ? FontWeight.bold : FontWeight.w500,
                 fontSize: 18,
+                color: Color(0xFFFFF8E1),
               ),
             ),
             trailing: Text(
               "#${index + 4}",
               style: TextStyle(
-                color: Color(0xFFFFF8E1), // blanco hueso
+                fontFamily: 'PressStart',
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
+                color: Color(0xFFFFF8E1),
               ),
             ),
           ),
@@ -152,17 +155,19 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
             Text(
               "Ranking",
               style: TextStyle(
+                fontFamily: 'PressStart',
                 fontSize: 36,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFFFFF8E1), // blanco hueso
+                color: Color(0xFFFFF8E1),
               ),
             ),
             SizedBox(height: 10),
             Text(
               "Tus mejores puntuaciones",
               style: TextStyle(
+                fontFamily: 'PressStart',
                 fontSize: 16,
-                color: Color(0xFFFFF8E1), // blanco hueso
+                color: Color(0xFFFFF8E1),
               ),
             ),
             SizedBox(height: 30),
@@ -187,9 +192,10 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
                 child: Text(
                   "Volver al Menú",
                   style: TextStyle(
+                    fontFamily: 'PressStart',
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFFFFF8E1), // blanco hueso
+                    color: Color(0xFFFFF8E1),
                   ),
                 ),
               ),

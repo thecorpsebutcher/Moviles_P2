@@ -75,7 +75,7 @@ class _GameScreenState extends State<GameScreen> {
     deathPlayer = SoundEffect('sounds/death.wav');
 
     // Música en bucle
-    bgMusic = BackgroundMusic('music/Boing!.wav');
+    bgMusic = BackgroundMusic('music/Boing.wav');
     bgMusic.playLoop();
 
     // Esperar primer frame para usar MediaQuery

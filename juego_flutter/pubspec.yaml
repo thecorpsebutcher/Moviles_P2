@@ -25,5 +25,10 @@ flutter:
     - assets/sounds/death.wav
     - assets/sounds/jump.wav
     - assets/sounds/jump2.wav
-    - assets/music/Boing!.wav
+    - assets/music/Boing.wav
     - assets/sprites/spike.png
+
+  fonts:
+    - family: PressStart
+      fonts:
+        - asset: assets/fonts/PressStart2P.ttf

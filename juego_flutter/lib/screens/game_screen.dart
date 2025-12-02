@@ -14,8 +14,8 @@ import '../widgets/pincho.dart';
 class GameScreen extends StatefulWidget {
   final Color playerColor;
   final Color backgroundColor;
-  final Color playerColor;
-  final Color backgroundColor;
+  // final Color playerColor;
+  // final Color backgroundColor;
 
   GameScreen({required this.playerColor, required this.backgroundColor});
 
@@ -53,6 +53,7 @@ class _GameScreenState extends State<GameScreen> {
   late SoundEffect bouncePlayer;
   late SoundEffect jumpPlayer;
   late SoundEffect deathPlayer;
+  late BackgroundMusic bgMusic;
 
   // Pincho widget cache
   late final String spikeWidget;
@@ -64,9 +65,14 @@ class _GameScreenState extends State<GameScreen> {
     // Cargar imagen de pincho
     spikeWidget = 'assets/sprites/spike.png';
 
+    // Inicializar sonidos
     bouncePlayer = SoundEffect('sounds/ballBounce.wav');
-    jumpPlayer = SoundEffect('sounds/jump.wav');
+    jumpPlayer = SoundEffect('sounds/jump2.wav');
     deathPlayer = SoundEffect('sounds/death.wav');
+
+    // Música en bucle
+    bgMusic = BackgroundMusic('music/Boing!.wav');
+    bgMusic.playLoop();
 
     // Esperar primer frame para usar MediaQuery
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -229,13 +235,14 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   @override
-  void dispose() {
-    _timer.cancel();
-    bouncePlayer.dispose();
-    jumpPlayer.dispose();
-    deathPlayer.dispose();
-    super.dispose();
-  }
+void dispose() {
+  _timer.cancel();
+
+  bgMusic.dispose();
+  
+  super.dispose();
+}
+
 
   void pauseGame() { _timer?.cancel(); }
 
@@ -284,7 +291,7 @@ class _GameScreenState extends State<GameScreen> {
                 height: circleSize,
                 decoration: BoxDecoration(
                   color: widget.playerColor,
-                  color: widget.playerColor,
+                  // color: widget.playerColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -319,7 +326,7 @@ class _GameScreenState extends State<GameScreen> {
               alignment: Alignment.topCenter,
               child: Padding(
                 padding: const EdgeInsets.only(top: 30),
-                padding: const EdgeInsets.only(top: 30),
+                // padding: const EdgeInsets.only(top: 30),
                 child: Text(
                   '$score',
                   style: const TextStyle(
@@ -328,7 +335,6 @@ class _GameScreenState extends State<GameScreen> {
                       fontWeight: FontWeight.bold),
                 ),
               ),
-            ),
             ),
           ],
         ),

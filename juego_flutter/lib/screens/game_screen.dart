@@ -15,8 +15,6 @@ import '../widgets/pincho.dart';
 class GameScreen extends StatefulWidget {
   final Color playerColor;
   final Color backgroundColor;
-  // final Color playerColor;
-  // final Color backgroundColor;
 
   GameScreen({required this.playerColor, required this.backgroundColor});
 
@@ -54,32 +52,23 @@ class _GameScreenState extends State<GameScreen> {
 
   int score = 0;
 
-  // Sonidos
   late SoundEffect bouncePlayer;
   late SoundEffect jumpPlayer;
   late SoundEffect deathPlayer;
-  // late BackgroundMusic bgMusic;
 
-  // Pincho widget cache
   late final String spikeWidget;
 
   @override
   void initState() {
     super.initState();
 
-    MusicManager().pauseMusic(); // pausa la música del menú
+    MusicManager().pauseMusic();
 
-    // Cargar imagen de pincho
     spikeWidget = 'assets/sprites/spike.png';
 
-    // Inicializar sonidos
     bouncePlayer = SoundEffect('sounds/ballBounce.wav');
     jumpPlayer = SoundEffect('sounds/jump2.wav');
     deathPlayer = SoundEffect('sounds/death.wav');
-
-    // Música en bucle
-    // bgMusic = BackgroundMusic('music/Boing.wav');
-    // bgMusic.playLoop();
 
     // Esperar primer frame para usar MediaQuery
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -110,8 +99,7 @@ class _GameScreenState extends State<GameScreen> {
     velocityY += gravity;
 
     // Sub-steps para mejorar la detección de colisiones
-    
-    int steps = 4; // número de mini pasos por frame
+    int steps = 4;
     double stepX = velocityX / steps;
     double stepY = velocityY / steps;
  
@@ -157,7 +145,7 @@ class _GameScreenState extends State<GameScreen> {
         pinchoY: py,          // coincide con el collider pintado
         pinchoWidth: pinchoWidth,
         pinchoHeight: pinchoHeight,
-        padding: 5,           // margen permisivo
+        padding: 5,
   )) {
     playDeathSound();
     gameOver();
@@ -210,7 +198,7 @@ void animateScore() {
   Future.delayed(const Duration(milliseconds: 50), () {
     if (!mounted) return;
     setState(() {
-      scoreScale = 1.0; // vuelve al tamaño original
+      scoreScale = 1.0;
     });
   });
 }
@@ -223,7 +211,7 @@ bool tocaPincho({
   required double pinchoY,
   required double pinchoWidth,
   required double pinchoHeight,
-  double padding = 5, // margen permisivo
+  double padding = 5,
 }) {
   double radius = ballSize / 2;
   double centerX = ballX + radius;
@@ -260,13 +248,9 @@ bool tocaPincho({
   int totalSpikes = rand.nextInt(maxSpikes - minSpikes + 1) + minSpikes;
   totalSpikes = totalSpikes.clamp(0, maxPossible);
 
-  // Lista inicial (todos vacíos)
   List<bool> spikes = List<bool>.filled(n, false);
 
-  // Creamos una lista con todos los índices disponibles
   List<int> allSlots = List.generate(n, (i) => i);
-
-  // Mezclamos para elegir aleatoriamente
   allSlots.shuffle(rand);
 
   // Activamos los primeros `totalSpikes` slots
@@ -285,10 +269,6 @@ bool tocaPincho({
   _timer?.cancel(); 
   await ScoreManager.saveScore(score);
 
-  // Reanudar música
-  // await MusicManager().playMenuMusic(); // <- aseguramos que arranque en menú
-
-  // Navegar a RankingScreen sin reemplazar rutas anteriores
   Navigator.push(
     context,
     MaterialPageRoute(builder: (context) => RankingScreen(lastScore: score)),
@@ -300,7 +280,6 @@ bool tocaPincho({
   velocityY = jump;
   playJumpSound();
 
-  // Añadir un punto al trail
   trail.add(TrailPoint(
     x: xPosition,
     y: yPosition,
@@ -308,7 +287,6 @@ bool tocaPincho({
     scale: 1.0,
   ));
 
-  // Animación squash + flash (como ya tienes)
   setState(() {
     ballScale = 0.85;
     flashOpacity = 0.35;
@@ -327,10 +305,7 @@ bool tocaPincho({
 
   @override
 void dispose() {
-  _timer.cancel();
-
-  // bgMusic.dispose();
-  
+  _timer.cancel();  
   super.dispose();
 }
 
@@ -347,15 +322,16 @@ void dispose() {
            countdownStart: 
            countdown,
             onFinished: () {
-               Navigator.of(context).pop(); // cerrar overlay 
-               velocityY = jump; // aplicar salto
-                playJumpSound(); // reproducir sonido de salto 
-                _startGame(); // reanudar juego 
-                },
-                 );
-                  },
-                   );
-                    }
+               Navigator.of(context).pop();
+               velocityY = jump;
+                playJumpSound();
+                _startGame();
+            },
+          );
+        },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -373,7 +349,6 @@ void dispose() {
                   onResume: () { resumeGameWithCountdown(); }, ), ), ); }, ), ], ),
         body: Stack(
           children: [
-             // Score
             Center(
               child: AnimatedScale(
                 scale: scoreScale,
@@ -388,7 +363,7 @@ void dispose() {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: 600, // tamaño enorme
+                        fontSize: 600,
                       ),
                     ),
                   ),
@@ -436,7 +411,7 @@ void dispose() {
                     ),
 
                               AnimatedOpacity(
-                    opacity: flashOpacity,              // ← se anima solo el flash
+                    opacity: flashOpacity,
                     duration: const Duration(milliseconds: 90),
                     child: Container(
                       width: circleSize,

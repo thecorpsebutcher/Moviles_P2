@@ -21,7 +21,7 @@ class _MenuScreenState extends State<MenuScreen> {
   @override
   void initState() {
     super.initState();
-    MusicManager().playMenuMusic(); // inicia música en bucle
+    MusicManager().playMenuMusic();
   }
 
   @override
@@ -33,7 +33,7 @@ class _MenuScreenState extends State<MenuScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "PELOTUDA",
+              "BOINGLOOP",
               style: TextStyle(
                 fontFamily: 'PressStart',
                 fontSize: 32,

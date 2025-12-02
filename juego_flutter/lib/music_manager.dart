@@ -8,7 +8,6 @@ class MusicManager {
   AudioPlayer? _player;
   bool _isPlaying = false;
 
-  /// Reproducir música del menú en bucle
   Future<void> playMenuMusic() async {
   if (_isPlaying) return; // ya suena
   _player ??= AudioPlayer(playerId: 'menuMusic');
@@ -21,9 +20,6 @@ class MusicManager {
   _isPlaying = true;
 }
 
-
-
-  /// Pausar música (por ejemplo, al iniciar el juego)
   Future<void> pauseMusic() async {
     if (_player != null && _isPlaying) {
       await _player!.pause();
@@ -31,7 +27,6 @@ class MusicManager {
     }
   }
 
-  /// Reanudar música (por ejemplo, al morir y volver al menú)
   Future<void> resumeMusic() async {
     if (_player != null && !_isPlaying) {
       await _player!.resume();
@@ -39,7 +34,6 @@ class MusicManager {
     }
   }
 
-  /// Detener música completamente (opcional)
   Future<void> stopMusic() async {
     if (_player != null) {
       await _player!.stop();

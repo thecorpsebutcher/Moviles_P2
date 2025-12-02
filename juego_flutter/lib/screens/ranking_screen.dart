@@ -18,7 +18,7 @@ class _RankingScreenState extends State<RankingScreen> with SingleTickerProvider
   @override
   void initState() {
     super.initState();
-    MusicManager().playMenuMusic(); // asegura que la música siga
+    MusicManager().playMenuMusic();
     loadScores();
   }
 
